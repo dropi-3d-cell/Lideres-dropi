@@ -30,3 +30,8 @@ desintegra. Para moverlo, cambia `data-seq="scroll"` al `<canvas class="seq">` d
 - `wheelGap`: sensibilidad de la rueda/trackpad.
 - `ring`: lista de insignias del cierre.
 - `starkDate`: fecha del conteo del Proyecto Stark.
+
+## Escenas nuevas
+- `#dropipay`: Programa de Líderes dropiPay (cómo funciona, niveles, tabla de ganancias, ejemplo y cómo ganar más).
+- `#matriz`: matriz de beneficios por nivel.
+Ambas son escenas con scroll interno (`stage--flow`). Se escribe siempre **dropiPay**, con d minúscula.

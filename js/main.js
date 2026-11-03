@@ -1082,7 +1082,7 @@
     open(el) {
       const stage = $('.stage', el), num = $('.num3d', el), wrap = $('.open-num', el), glow = $('.num-glow', el);
       const l1 = $('.open-line--1', el), l2 = $('.open-line--2', el), l3 = $('.open-line--3', el);
-      const words = $$('.open-words li', el), wordsWrap = $('.open-words', el), head = $('.open-head', el), hint = $('.scroll-hint', el);
+      const words = $$('.open-words li', el), wordsWrap = $('.open-words', el), hint = $('.scroll-hint', el);
       const seq = $('.seq', el), beam = $('.beam', el);
       const P = Particles($('.particles', el), $('.num3d-face', num), stage);
       const ND = NumDots(num), ndCv = $('.num-dots', num);
@@ -1109,15 +1109,18 @@
 
           op(l1, 1 - seg(p, .07, .12), `translateY(${-seg(p, .07, .12) * 20}px)`);
           op(l2, seg(p, .11, .16) * (1 - seg(p, .36, .44)), `translateY(${(1 - seg(p, .11, .16)) * 20}px)`);
-          op(l3, seg(p, .45, .5));
-          wordsWrap.style.opacity = 1 - seg(p, .84, .88);
+          const k3 = eo(seg(p, .45, .52));
+          op(l3, k3, `translateY(${((1 - k3) * 40).toFixed(2)}px) scale(${lerp(.92, 1, k3).toFixed(4)})`);
+          wordsWrap.style.opacity = 1;
+          // Al final del tramo se encienden todas las palabras a la vez
+          const all = p >= .83;
           const active = Math.floor((p - .5) / .055);
           words.forEach((w, i) => {
             const a = .5 + i * .055, t = eo(seg(p, a, a + .06));
             w.firstElementChild.style.transform = `translateY(${(1 - t) * 160}%)`;
-            w.classList.toggle('is-on', i === Math.min(active, words.length - 1) && p >= a);
+            w.classList.toggle('is-on', all || (i === Math.min(active, words.length - 1) && p >= a));
+            w.classList.toggle('is-done', p >= a + .06);
           });
-          op(head, seg(p, .87, .94), `translateY(${(1 - seg(p, .87, .94)) * 30}px)`);
           hint.style.opacity = 1 - seg(p, 0, .05);
         }
       };
@@ -1611,6 +1614,16 @@
     rules(el) {
       const list = $('.rules', el);
       return { update(p, e) { list.classList.toggle('is-in', e > .35); } };
+    },
+
+    // Programa de Líderes dropiPay y matriz de beneficios: entran por bloques
+    dpay(el) {
+      const w = $('.wrap', el);
+      return { update(p, e) { w.classList.toggle('is-in', e > .35); } };
+    },
+    matrix(el) {
+      const w = $('.wrap', el);
+      return { update(p, e) { w.classList.toggle('is-in', e > .35); } };
     },
 
     close(el) {

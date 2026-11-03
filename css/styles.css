@@ -1690,3 +1690,114 @@ body { letter-spacing: -.012em; }
     radial-gradient(ellipse 70% 66% at 50% 50%, rgba(21, 21, 21, .35) 25%, var(--bg) 96%),
     linear-gradient(180deg, rgba(21, 21, 21, .5), transparent 22%, transparent 78%, rgba(21, 21, 21, .6));
 }
+
+/* =====================================================================
+   AJUSTES · Revisión Dubái (nov 2026)
+   ===================================================================== */
+
+/* ---------- Apertura: "Y aun así, Dropi se supera." grande y llamativo ---------- */
+.open-line--3 {
+  font-family: var(--f-display); font-weight: 800; letter-spacing: -.012em;
+  font-size: clamp(2.6rem, 6vw, 6.8rem); line-height: .9; color: var(--text);
+  margin-bottom: .32em; transform-origin: left bottom;
+}
+.open-line--3 b { font-weight: inherit; color: var(--o); text-shadow: 0 0 40px rgba(255, 132, 5, .45); }
+.open-words li.is-done:not(.is-on) span { color: var(--text); }
+@media (min-width: 761px) {
+  .open-words li { font-size: min(8.8vw, 9.4vh); line-height: .96; }
+}
+@media (max-width: 760px) {
+  .open-line--3 { font-size: 11vw; }
+  .open-words li { font-size: 11.4vw; }
+}
+
+/* ---------- Beneficio 6: millas siempre visibles ---------- */
+@media (min-width: 761px) {
+  .panel--lider { padding-bottom: 110px; }
+  .lider-info { align-self: center; gap: 1.6rem; max-width: 460px; }
+  .lider-info .miles { display: flex; flex-wrap: wrap; align-items: flex-end; column-gap: 1.2rem; }
+  .lider-info .miles-ratio { font-size: clamp(3.8rem, 5.8vw, 6.6rem); }
+  .lider-info .miles-count { margin: 0 0 .5rem; }
+  .lider-info .miles .ui-note { flex-basis: 100%; margin: .4rem 0 0; }
+}
+
+/* ---------- Programa de Líderes dropiPay + Matriz por nivel ---------- */
+.dp, .mx { display: grid; gap: clamp(2.4rem, 6vh, 4rem); }
+.dp-head .h-lg { max-width: 16ch; margin: 1rem 0 1.2rem; }
+.dp-head .lead { max-width: 58ch; }
+.dp-h { font-family: var(--f-display); font-weight: 400; font-size: clamp(1.7rem, 2.6vw, 2.6rem); line-height: 1; color: var(--o-hi); margin-bottom: 1.4rem; max-width: 26ch; }
+
+.dp-steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; counter-reset: st; }
+.dp-steps li { counter-increment: st; position: relative; padding: 1.3rem 1.2rem 1.2rem; border-top: 2px solid rgba(255, 132, 5, .5); color: #e2dcd5; line-height: 1.5; }
+.dp-steps li::before { content: counter(st); display: block; font-family: var(--f-display); font-size: 2.8rem; line-height: 1; color: var(--o); margin-bottom: .6rem; }
+.dp-steps b { color: var(--o-pale); font-weight: 600; }
+
+.dp-tiers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; align-items: end; }
+.dp-tier { position: relative; padding: 1.6rem 1.5rem 1.4rem; border-radius: 18px; background: var(--bg-2); border: 1px solid var(--line); }
+.dp-tier--2 { padding-top: 2.4rem; border-color: rgba(255, 177, 92, .3); }
+.dp-tier--3 { padding-top: 3.4rem; border-color: rgba(255, 132, 5, .55); background: linear-gradient(180deg, rgba(255, 132, 5, .14), var(--bg-2) 70%); box-shadow: 0 -24px 60px -36px rgba(255, 132, 5, .9); }
+.dp-tier-name { font-family: var(--f-display); font-size: clamp(1.9rem, 2.8vw, 2.8rem); line-height: 1; }
+.dp-tier-name span { font-size: .7em; vertical-align: .1em; }
+.dp-tier-gain { margin: .5rem 0 1.2rem; font-size: .95rem; color: var(--muted); }
+.dp-tier-gain b { font-family: var(--f-display); font-weight: 800; font-size: 3.4rem; line-height: .9; color: var(--o); display: block; }
+.dp-tier dl { display: grid; gap: .2rem; font-size: .92rem; }
+.dp-tier dt { color: var(--faint); font-size: .78rem; font-weight: 600; margin-top: .6rem; }
+.dp-tier dd { color: #e2dcd5; }
+
+.dp-table, .mx-table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 640px; font-variant-numeric: tabular-nums; }
+.dp-table th, .dp-table td, .mx-table th, .mx-table td { text-align: left; padding: .8rem 1.1rem; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.dp-table thead th, .mx-table thead th { font-size: .85rem; font-weight: 600; color: var(--muted); vertical-align: bottom; }
+.dp-table tbody th { font-weight: 500; position: relative; padding-left: 2rem; }
+.dp-table tbody th::before { content: ""; position: absolute; left: .7rem; top: 50%; width: 9px; height: 9px; margin-top: -4.5px; border-radius: 50%; background: var(--c, #fff); box-shadow: 0 0 10px var(--c, transparent); }
+.dp-table td { color: var(--muted); }
+.dp-table .is-top { color: var(--text); background: rgba(255, 132, 5, .07); border-left: 1px solid rgba(255, 132, 5, .3); border-right: 1px solid rgba(255, 132, 5, .3); }
+.dp-table thead .is-top { color: var(--o-hi); border-top: 1px solid rgba(255, 132, 5, .3); border-radius: 14px 14px 0 0; }
+.dp-table tbody tr:last-child .is-top { border-radius: 0 0 14px 14px; }
+.t-hi { --c: #3ddc84; } .t-mid { --c: #ffc93c; } .t-base { --c: #d9d4ce; }
+.dp-table--ex tbody th::before { display: none; }
+.dp-table--ex tbody th { padding-left: 1.1rem; }
+.dp-total th, .dp-total td { font-weight: 700; color: var(--text); border-bottom: 0; }
+.dp-total .is-top { color: var(--o-hi); }
+.dp-legend { display: flex; flex-wrap: wrap; gap: .4rem 1.6rem; margin-top: 1rem; font-size: .85rem; color: var(--muted); }
+.dp-legend span { display: inline-flex; align-items: center; gap: .5rem; }
+.dp-legend span::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--c); box-shadow: 0 0 10px var(--c); }
+.dp-copy { color: #e2dcd5; max-width: 62ch; margin-bottom: 1rem; }
+.dp-callout { margin-top: 1.4rem; font-family: var(--f-display); font-size: clamp(1.6rem, 2.6vw, 2.6rem); line-height: 1.02; max-width: 28ch; color: var(--o-pale); }
+.dp-note { margin-top: .8rem; font-size: .8rem; color: var(--faint); }
+.dp-more { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.2rem 2.4rem; }
+.dp-more li { position: relative; padding-left: 1.3rem; color: #e2dcd5; line-height: 1.5; }
+.dp-more li::before { content: ""; position: absolute; left: 0; top: .62em; width: 6px; height: 6px; border-radius: 50%; background: var(--o); box-shadow: 0 0 8px var(--o); }
+.dp-more b { color: var(--o-pale); font-weight: 600; }
+
+.mx-table { min-width: 860px; }
+.mx-table thead th { padding-bottom: 1rem; }
+.mx-lvl { display: block; font-family: var(--f-display); font-weight: 400; font-size: 1.9rem; line-height: 1; color: var(--text); margin-bottom: .3rem; }
+.mx-table thead small { font-size: .74rem; font-weight: 500; color: var(--faint); }
+.mx-bronce .mx-lvl { color: #e0a372; } .mx-plata .mx-lvl { color: #dcdcdc; } .mx-oro .mx-lvl { color: var(--o-hi); }
+.mx-table tbody th { font-weight: 500; width: 34%; }
+.mx-table td { color: var(--muted); font-size: .9rem; text-align: center; }
+.mx-table thead th:not(:first-child) { text-align: center; }
+.mx-table td.ok { color: var(--o); font-weight: 700; font-size: 1.1rem; }
+.mx-table td.ok small { display: block; font-size: .72rem; font-weight: 500; color: var(--muted); }
+.mx-table .mx-oro { background: rgba(255, 132, 5, .07); border-left: 1px solid rgba(255, 132, 5, .3); border-right: 1px solid rgba(255, 132, 5, .3); color: var(--text); }
+.mx-table thead .mx-oro { border-top: 1px solid rgba(255, 132, 5, .3); border-radius: 14px 14px 0 0; }
+.mx-table tbody tr:last-child .mx-oro { border-radius: 0 0 14px 14px; }
+.mx-table tbody tr:hover th, .mx-table tbody tr:hover td { background-color: rgba(255, 255, 255, .025); }
+
+/* Entrada por bloques */
+.dp > *, .mx > * { opacity: 0; transform: translateY(22px); transition: opacity .9s var(--ease), transform .9s var(--ease); }
+.dp > :nth-child(2), .mx > :nth-child(2) { transition-delay: .12s; } .dp > :nth-child(3) { transition-delay: .24s; } .dp > :nth-child(n+4) { transition-delay: .36s; }
+.dp.is-in > *, .mx.is-in > * { opacity: 1; transform: none; }
+html:not(.js) .dp > *, html:not(.js) .mx > * { opacity: 1; transform: none; }
+
+@media (max-width: 1080px) {
+  .dp-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+  .dp-steps, .dp-tiers, .dp-more { grid-template-columns: 1fr; }
+  .dp-tier, .dp-tier--2, .dp-tier--3 { padding-top: 1.4rem; }
+  .dp-table th, .dp-table td, .mx-table th, .mx-table td { padding: .65rem .8rem; }
+}
+.dp-head .chapter-tag { position: static; }
+.dp-head .h-lg { margin-top: 1.2rem; }
+@media (min-width: 1081px) { .s-dpay .stage--flow, .s-matrix .stage--flow { padding-right: calc(var(--gutter) + 110px); } }
