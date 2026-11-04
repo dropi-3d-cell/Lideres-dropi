@@ -1081,7 +1081,7 @@
 
     open(el) {
       const stage = $('.stage', el), num = $('.num3d', el), wrap = $('.open-num', el), glow = $('.num-glow', el);
-      const l1 = $('.open-line--1', el), l3 = $('.open-line--3', el);
+      const l1 = $('.open-line--1', el), l2 = $('.open-line--2', el), l3 = $('.open-line--3', el);
       const words = $$('.open-words li', el), wordsWrap = $('.open-words', el), hint = $('.scroll-hint', el);
       const seq = $('.seq', el), beam = $('.beam', el);
       const P = Particles($('.particles', el), $('.num3d-face', num), stage);
@@ -1107,7 +1107,8 @@
           drawSeq(seq, seg(p, 0, .6));
           if (seq.classList.contains('is-ready')) seq.style.opacity = (lerp(.35, 1, seg(p, .12, .24)) * (1 - seg(p, .52, .62))).toFixed(3);
 
-          op(l1, 1 - seg(p, .36, .44), `translateY(${-seg(p, .36, .44) * 20}px)`);
+          op(l1, 1 - seg(p, .07, .12), `translateY(${-seg(p, .07, .12) * 20}px)`);
+          op(l2, seg(p, .11, .16) * (1 - seg(p, .36, .44)), `translateY(${(1 - seg(p, .11, .16)) * 20}px)`);
           const k3 = eo(seg(p, .45, .52));
           op(l3, k3, `translateY(${((1 - k3) * 40).toFixed(2)}px) scale(${lerp(.92, 1, k3).toFixed(4)})`);
           wordsWrap.style.opacity = 1;

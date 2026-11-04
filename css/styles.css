@@ -1824,3 +1824,35 @@ html:not(.js) .dp > *, html:not(.js) .mx > * { opacity: 1; transform: none; }
 .route-fly { position: absolute; inset: 0; z-index: 4; pointer-events: none; overflow: hidden; }
 .route-fly .fly { position: absolute; left: -40px; top: -40px; width: 80px; height: 80px; overflow: visible; opacity: 0; will-change: transform, opacity; }
 .fly-anchor { fill: none; stroke: none; }
+
+/* =====================================================================
+   AJUSTES · Revisión 2 (nov 2026)
+   ===================================================================== */
+
+/* Intro de beneficios: la etiqueta "(4) Lo que desbloquea…" va encima del titular, nunca debajo */
+.panel--intro .chapter-tag { position: relative; top: auto; left: auto; align-self: flex-start; margin: 0 0 clamp(1rem, 3vh, 2rem); }
+.panel--intro .h-xl { font-size: clamp(2.6rem, min(7vw, 12.5vh), 8.4rem); max-width: 100%; overflow-wrap: break-word; }
+.panel--intro .h-xl > span { max-width: 100%; }
+@media (max-width: 1080px) { .panel--intro .h-xl { font-size: min(10vw, 11vh); } }
+@media (max-width: 760px) {
+  .panel--intro .h-xl { font-size: min(13.5vw, 10vh); }
+  .panel--intro .chapter-tag { font-size: .8rem; }
+}
+
+/* Beneficio 6: fondo desenfocado y más oscuro detrás de la información de la derecha */
+.lider-info { position: relative; isolation: isolate; }
+.lider-info::before {
+  content: ""; position: absolute; inset: -2.2rem -2.4rem; z-index: -1; pointer-events: none;
+  border-radius: 28px;
+  background: rgba(12, 10, 8, .38);
+  -webkit-backdrop-filter: blur(16px) brightness(.7) saturate(1.05); backdrop-filter: blur(16px) brightness(.7) saturate(1.05);
+  -webkit-mask-image: radial-gradient(130% 120% at 50% 50%, #000 62%, transparent 100%);
+          mask-image: radial-gradient(130% 120% at 50% 50%, #000 62%, transparent 100%);
+}
+.lider-info .panel-list li { color: #eee7df; text-shadow: 0 1px 12px rgba(0, 0, 0, .55); }
+.lider-info .panel-list b { color: var(--o-pale); }
+.miles-lbl { flex-basis: 100%; margin: 0 0 .4rem; font-size: .95rem; color: #eee7df; }
+.miles-lbl b { color: var(--o-pale); font-weight: 600; }
+.lider-info .miles-count { color: #ddd5cc; }
+.lider-info .miles .ui-note { color: rgba(238, 231, 223, .55); }
+@media (max-width: 760px) { .lider-info::before { inset: -1.2rem -1rem; } }
