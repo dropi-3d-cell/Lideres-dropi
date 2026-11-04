@@ -1691,6 +1691,22 @@ body { letter-spacing: -.012em; }
     linear-gradient(180deg, rgba(21, 21, 21, .5), transparent 22%, transparent 78%, rgba(21, 21, 21, .6));
 }
 
+/* =========================================================
+   Ajustes v3 · premios por cinturón, sin puntos ni drops
+   ========================================================= */
+.badge-dots, .s-ley .drops { display: none !important; }
+.tier .tier-prize { font-style: normal; font-size: .74rem; line-height: 1.3; color: #fff; opacity: .88; max-width: 30ch; margin-top: .25rem; }
+.tier:not(.is-on) .tier-prize { filter: blur(.6px); }
+@media (max-height: 700px) and (min-width: 761px) {
+  .tier .tier-prize { font-size: .68rem; }
+}
+@media (max-width: 760px) {
+  .tier .tier-prize { font-size: .62rem; max-width: none; }
+}
+.s-ley .ley-dash { grid-template-rows: minmax(0, 1fr); }
+.route-lbl.route-lbl--sm { font-size: clamp(1.1rem, 1.5vw, 1.7rem); }
+@media (max-width: 760px) { .route-lbl.route-lbl--sm { font-size: .95rem; } }
+
 /* =====================================================================
    AJUSTES · Revisión Dubái (nov 2026)
    ===================================================================== */
@@ -1801,3 +1817,10 @@ html:not(.js) .dp > *, html:not(.js) .mx > * { opacity: 1; transform: none; }
 .dp-head .chapter-tag { position: static; }
 .dp-head .h-lg { margin-top: 1.2rem; }
 @media (min-width: 1081px) { .s-dpay .stage--flow, .s-matrix .stage--flow { padding-right: calc(var(--gutter) + 110px); } }
+
+/* ---------- Mapa: vista más alejada + aviones siempre de frente ---------- */
+.s-route .route-plane { left: 63%; top: 47%; width: min(104vh, 88vw); }
+@media (max-width: 760px) { .s-route .route-plane { left: 50%; width: 130vw; top: 58%; } }
+.route-fly { position: absolute; inset: 0; z-index: 4; pointer-events: none; overflow: hidden; }
+.route-fly .fly { position: absolute; left: -40px; top: -40px; width: 80px; height: 80px; overflow: visible; opacity: 0; will-change: transform, opacity; }
+.fly-anchor { fill: none; stroke: none; }

@@ -700,7 +700,7 @@
 
 
   /* ---------------------------------------------------------
-     Tarjeta DropiPay: ondas de puntos digitales sobre la superficie.
+     Tarjeta dropiPay: ondas de puntos digitales sobre la superficie.
      Puntos diminutos que respiran; al girar la tarjeta se revelan.
      --------------------------------------------------------- */
   /* Color de las ondas de puntos: se lee de la variable CSS --dots-color
@@ -1081,7 +1081,7 @@
 
     open(el) {
       const stage = $('.stage', el), num = $('.num3d', el), wrap = $('.open-num', el), glow = $('.num-glow', el);
-      const l1 = $('.open-line--1', el), l2 = $('.open-line--2', el), l3 = $('.open-line--3', el);
+      const l1 = $('.open-line--1', el), l3 = $('.open-line--3', el);
       const words = $$('.open-words li', el), wordsWrap = $('.open-words', el), hint = $('.scroll-hint', el);
       const seq = $('.seq', el), beam = $('.beam', el);
       const P = Particles($('.particles', el), $('.num3d-face', num), stage);
@@ -1107,8 +1107,7 @@
           drawSeq(seq, seg(p, 0, .6));
           if (seq.classList.contains('is-ready')) seq.style.opacity = (lerp(.35, 1, seg(p, .12, .24)) * (1 - seg(p, .52, .62))).toFixed(3);
 
-          op(l1, 1 - seg(p, .07, .12), `translateY(${-seg(p, .07, .12) * 20}px)`);
-          op(l2, seg(p, .11, .16) * (1 - seg(p, .36, .44)), `translateY(${(1 - seg(p, .11, .16)) * 20}px)`);
+          op(l1, 1 - seg(p, .36, .44), `translateY(${-seg(p, .36, .44) * 20}px)`);
           const k3 = eo(seg(p, .45, .52));
           op(l3, k3, `translateY(${((1 - k3) * 40).toFixed(2)}px) scale(${lerp(.92, 1, k3).toFixed(4)})`);
           wordsWrap.style.opacity = 1;
@@ -1157,82 +1156,150 @@
     },
 
     route(el) {
-      /* Mapa 3D: plano inclinado con China y Colombia extruidas (capas en Z como
-         el castillo) y la trayectoria en arco que se levanta del plano. */
-      const plane3 = $('.route-plane', el), wall = $('.route-wall', el), arc = $('.route-arc', el);
-      const path = $('.route-path', el), bgp = $('.route-bg', el), flow = $('.route-flow', el);
-      const cn = $('.node--cn', el), co = $('.node--co', el), gshadow = $('.ground-shadow', el);
-      const plane = $('.plane', el), body = $('.plane-body', el), top = $('.plane-top', el);
+      /* Mapa 3D: plano inclinado con China y LATAM extruidas; un arco por destino,
+         cada uno con su avión, que despegan en cascada desde China. */
+      const plane3 = $('.route-plane', el), wall0 = $('.route-wall', el), gshadow0 = $('.ground-shadow', el);
+      const cn = $('.node--cn', el);
       const copy = $('.route-copy', el), countries = $$('.countries li', el), seq = $('.seq', el);
       const stage = $('.stage', el);
-      const lbls = $$('.route-lbl', el).map(l => ({ el: l, node: l.dataset.node === 'cn' ? cn : co }));
-      lbls.forEach(l => { l.dot = $('.node-dot', l.node); });
-      // Capas de profundidad de cada mapa (detrás de la capa frontal)
       $$('.geo', el).forEach(g => {
         [2, 1].forEach(k => { const c = g.cloneNode(true); c.classList.add('geo--b', `geo--b${k}`); g.parentNode.insertBefore(c, g); });
         g.classList.add('geo--f');
       });
-      // Copia desplazada del trazo: le da grosor al avión
-      const depth = top.cloneNode(true); depth.setAttribute('class', 'plane-depth'); body.insertBefore(depth, top);
-      const VB = { x: -120, y: -560, s: 1600 }, CN = { x: 1060, y: 150 }, CO = { x: 300, y: 330 };
-      const gAng = Math.atan2(CO.y - CN.y, CO.x - CN.x) * 180 / Math.PI;
-      let len = 0, Wl = 0, Hl = 0, k = 1;
-      const angAt = l => { const a = path.getPointAtLength(clamp(l - 2, 0, len)), b = path.getPointAtLength(clamp(l + 2, 0, len)); return Math.atan2(b.y - a.y, b.x - a.x); };
+      const VB = { x: -120, y: -560, s: 1600 }, CN = { x: 1060, y: 150 };
+      const DEST = [
+        { id: 'co', x: 300, y: 330 }, { id: 'pa', x: 225, y: 271 }, { id: 'ec', x: 240, y: 397 },
+        { id: 'gt', x: 75, y: 194 }, { id: 'mx', x: -44, y: 128 }, { id: 'cl', x: 347, y: 853 }
+      ];
+      // Clonar primero (antes de añadir la copia de grosor del avión)
+      const walls = DEST.map((_, i) => i ? wall0.cloneNode(true) : wall0);
+      const shadows = DEST.map((_, i) => i ? gshadow0.cloneNode(true) : gshadow0);
+      walls.slice(1).forEach(w => wall0.parentNode.appendChild(w));
+      shadows.slice(1).forEach(g => gshadow0.parentNode.insertBefore(g, gshadow0.nextSibling));
+      const routes = DEST.map((D, i) => {
+        const wall = walls[i], top = $('.plane-top', wall), body = $('.plane-body', wall);
+        const depth = top.cloneNode(true); depth.setAttribute('class', 'plane-depth'); body.insertBefore(depth, top);
+        return {
+          D, wall, gs: shadows[i], arc: $('.route-arc', wall), path: $('.route-path', wall), bgp: $('.route-bg', wall),
+          flow: $('.route-flow', wall), plane: $('.plane', wall), depth, node: $(`.node[data-id="${D.id}"]`, el),
+          gAng: Math.atan2(D.y - CN.y, D.x - CN.x) * 180 / Math.PI, len: 0, t: 0, t0: .04 + i * .045,
+          // Ida y vuelta continua: cada ruta con su propia duración y sus pausas, para que no vuelen al tiempo
+          dur: [4.2, 3.4, 4.8, 5.6, 6.4, 7.2][i], wait: [.6, 1.4, .9, 2.1, 1.1, 1.8][i], start: null
+        };
+      });
+      /* Aviones "billboard": se dibujan en una capa plana sobre el mapa, siempre de frente a la
+         cámara. Dos anclas invisibles sobre cada arco dan su posición y su dirección en pantalla. */
+      const NSr = 'http://www.w3.org/2000/svg';
+      const flyLayer = document.createElement('div'); flyLayer.className = 'route-fly'; flyLayer.setAttribute('aria-hidden', 'true');
+      $('.tilt-shift', el).after(flyLayer);
+      routes.forEach(r => {
+        r.plane.style.visibility = 'hidden';
+        const svg = document.createElementNS(NSr, 'svg');
+        svg.setAttribute('class', 'fly'); svg.setAttribute('viewBox', '-40 -40 80 80');
+        const g = document.createElementNS(NSr, 'g'); g.setAttribute('class', 'fly-g');
+        const body = $('.plane-body', r.wall).cloneNode(true);
+        g.appendChild(body); svg.appendChild(g); flyLayer.appendChild(svg);
+        r.fly = svg; r.flyG = g; r.flyDepth = $('.plane-depth', body); r.flyAng = 0;
+        const arcSvg = r.arc;
+        r.anA = document.createElementNS(NSr, 'circle'); r.anB = document.createElementNS(NSr, 'circle');
+        [r.anA, r.anB].forEach(c => { c.setAttribute('r', '.5'); c.setAttribute('class', 'fly-anchor'); arcSvg.appendChild(c); });
+      });
+      const byId = {}; routes.forEach(r => { byId[r.D.id] = r; });
+      const lbls = $$('.route-lbl', el).map(l => {
+        const id = l.dataset.node, node = id === 'cn' ? cn : byId[id].node;
+        return { el: l, id, node, dot: $('.node-dot', node) };
+      });
+      let k = 1;
+      const angAt = (r, l) => { const a = r.path.getPointAtLength(clamp(l - 2, 0, r.len)), b = r.path.getPointAtLength(clamp(l + 2, 0, r.len)); return Math.atan2(b.y - a.y, b.x - a.x); };
       const build = () => {
         const S = plane3.clientWidth; if (!S) return;
         k = S / VB.s;
-        const ax = (CN.x - VB.x) * k, ay = (CN.y - VB.y) * k, bx = (CO.x - VB.x) * k, by = (CO.y - VB.y) * k;
-        Wl = Math.hypot(bx - ax, by - ay); Hl = Wl * .4;
-        const ang = Math.atan2(by - ay, bx - ax);
-        Object.assign(wall.style, { left: `${ax}px`, top: `${ay - Hl}px`, width: `${Wl}px`, height: `${Hl}px`, transform: `rotateZ(${ang}rad) rotateX(-90deg)` });
-        arc.setAttribute('viewBox', `0 0 ${Wl.toFixed(1)} ${Hl.toFixed(1)}`);
-        const d = `M0 ${Hl.toFixed(1)} Q ${(Wl / 2).toFixed(1)} ${(-Hl * .84).toFixed(1)} ${Wl.toFixed(1)} ${Hl.toFixed(1)}`;
-        [path, bgp, flow].forEach(q => q.setAttribute('d', d));
-        len = path.getTotalLength();
-        flow.style.strokeDasharray = `${(len * .08).toFixed(1)} ${(len * 1.2).toFixed(1)}`;
+        const ax = (CN.x - VB.x) * k, ay = (CN.y - VB.y) * k;
+        routes.forEach(r => {
+          const bx = (r.D.x - VB.x) * k, by = (r.D.y - VB.y) * k;
+          const Wl = Math.hypot(bx - ax, by - ay), Hl = Wl * .4, ang = Math.atan2(by - ay, bx - ax);
+          Object.assign(r.wall.style, { left: `${ax}px`, top: `${ay - Hl}px`, width: `${Wl}px`, height: `${Hl}px`, transform: `rotateZ(${ang}rad) rotateX(-90deg)` });
+          r.arc.setAttribute('viewBox', `0 0 ${Wl.toFixed(1)} ${Hl.toFixed(1)}`);
+          const d = `M0 ${Hl.toFixed(1)} Q ${(Wl / 2).toFixed(1)} ${(-Hl * .84).toFixed(1)} ${Wl.toFixed(1)} ${Hl.toFixed(1)}`;
+          [r.path, r.bgp, r.flow].forEach(q => q.setAttribute('d', d));
+          r.len = r.path.getTotalLength();
+          r.flow.style.strokeDasharray = `${(r.len * .08).toFixed(1)} ${(r.len * 1.2).toFixed(1)}`;
+        });
       };
       return {
         live: !RM, build,
         update(p, e) {
-          if (!len) build();
-          if (!len) return;
+          if (!routes[0].len) build();
+          if (!routes[0].len) return;
           op(copy, seg(e, .4, 1), `translateY(${(1 - seg(e, .4, 1)) * 30}px)`);
-          const t = eio(seg(p, .04, .5));
-          // El arco se dibuja en el aire y queda lleno al llegar
-          if (t >= .999) { path.style.strokeDasharray = 'none'; path.style.strokeDashoffset = '0'; }
-          else { path.style.strokeDasharray = `${len} ${len + 40}`; path.style.strokeDashoffset = (len * (1 - t)).toFixed(2); }
-          // Avión: sigue la tangente del arco (sube y baja en 3D)
-          const l = len * t, pt = path.getPointAtLength(l), ang = angAt(l), alt = Math.sin(Math.PI * t);
-          const sc = k * (1.05 + .35 * alt);
-          plane.setAttribute('transform', `translate(${pt.x.toFixed(2)} ${pt.y.toFixed(2)}) rotate(${(ang * 180 / Math.PI).toFixed(2)}) scale(${sc.toFixed(3)} ${(sc * .82).toFixed(3)})`);
-          depth.setAttribute('transform', `translate(${(-1.2 * alt).toFixed(2)} 2.6)`);
-          const vis = seg(t, 0, .03) * (1 - seg(t, .965, 1));
-          plane.style.opacity = vis.toFixed(3);
-          // Sombra del avión sobre el mapa: misma posición, en el suelo
-          const gx = lerp(CN.x, CO.x, t), gy = lerp(CN.y, CO.y, t);
-          gshadow.setAttribute('transform', `translate(${gx.toFixed(1)} ${gy.toFixed(1)}) rotate(${gAng.toFixed(1)}) scale(${(1 - alt * .35).toFixed(3)})`);
-          gshadow.style.opacity = (vis * (.6 - alt * .38)).toFixed(3);
-          // Pulso de energía que recorre el arco ya completo
-          const done = seg(t, .96, 1);
-          flow.style.opacity = (done * .9).toFixed(3);
-          if (done > 0) flow.style.strokeDashoffset = (-((time * len * .32) % (len * 1.28))).toFixed(1);
+          let land = 0, all = true;
+          const sr0 = stage.getBoundingClientRect();
+          routes.forEach(r => {
+            // El primer vuelo corre por tiempo (no por scroll), para que ningún avión quede congelado
+            // en el aire entre un paso y otro: despegan en cascada apenas la escena arranca.
+            if (e > .3) { if (r.launch == null) r.launch = time + routes.indexOf(r) * .45; }
+            else if (e < .05) r.launch = null;
+            const t = r.t = RM ? (r.launch != null ? 1 : 0) : (r.launch == null ? 0 : eio(clamp((time - r.launch) / 2.8))), len = r.len;
+            if (t >= .999) { r.path.style.strokeDasharray = 'none'; r.path.style.strokeDashoffset = '0'; }
+            else { r.path.style.strokeDasharray = `${len} ${len + 40}`; r.path.style.strokeDashoffset = (len * (1 - t)).toFixed(2); }
+            // Al aterrizar el primer vuelo, el avión empieza a ir y venir entre China y su destino
+            let u = t, back = false;
+            if (t >= .999 && !RM) {
+              if (r.start == null) r.start = time;
+              const cyc = 2 * (r.dur + r.wait), ph = (time - r.start) % cyc;
+              if (ph < r.wait) u = 1;                                                       // en tierra, en el destino
+              else if (ph < r.wait + r.dur) { u = 1 - eio((ph - r.wait) / r.dur); back = true; } // vuelta a China
+              else if (ph < 2 * r.wait + r.dur) { u = 0; back = true; }                    // en tierra, en China
+              else u = eio((ph - 2 * r.wait - r.dur) / r.dur);                              // ida al destino
+            } else r.start = null;
+            const l = len * u, pt = r.path.getPointAtLength(l), ang = angAt(r, l) + (back ? Math.PI : 0), alt = Math.sin(Math.PI * u);
+            const sc = k * (1.05 + .35 * alt);
+            r.plane.setAttribute('transform', `translate(${pt.x.toFixed(2)} ${pt.y.toFixed(2)}) rotate(${(ang * 180 / Math.PI).toFixed(2)}) scale(${sc.toFixed(3)} ${(sc * .82).toFixed(3)})`);
+            r.depth.setAttribute('transform', `translate(${(-1.2 * alt).toFixed(2)} 2.6)`);
+            const vis = seg(u, 0, .03) * (1 - seg(u, .965, 1));
+            r.plane.style.opacity = vis.toFixed(3);
+            // Avión de frente a la cámara: posición y rumbo proyectados en pantalla
+            if (vis > .001) {
+              const dl = Math.max(6, len * .04) * (back ? -1 : 1);
+              let la = l, lb = clamp(l + dl, 0, len);
+              if (Math.abs(lb - la) < 1) { lb = l; la = clamp(l - dl, 0, len); }
+              const qa = r.path.getPointAtLength(la), qb = r.path.getPointAtLength(lb);
+              r.anA.setAttribute('cx', qa.x.toFixed(2)); r.anA.setAttribute('cy', qa.y.toFixed(2));
+              r.anB.setAttribute('cx', qb.x.toFixed(2)); r.anB.setAttribute('cy', qb.y.toFixed(2));
+              const A = r.anA.getBoundingClientRect(), B = r.anB.getBoundingClientRect();
+              const ax2 = A.left + A.width / 2, ay2 = A.top + A.height / 2, bx2 = B.left + B.width / 2, by2 = B.top + B.height / 2;
+              if (Math.hypot(bx2 - ax2, by2 - ay2) > 1.5) r.flyAng = Math.atan2(by2 - ay2, bx2 - ax2);
+              const fx = la === l ? ax2 : bx2, fy = la === l ? ay2 : by2;
+              const size = sc * 1.1;
+              r.fly.style.transform = `translate3d(${(fx - sr0.left).toFixed(1)}px,${(fy - sr0.top).toFixed(1)}px,0) rotate(${(r.flyAng * 180 / Math.PI).toFixed(2)}deg) scale(${size.toFixed(3)})`;
+              if (r.flyDepth) r.flyDepth.setAttribute('transform', `translate(${(-1.2 * alt).toFixed(2)} 2.6)`);
+            }
+            r.fly.style.opacity = vis.toFixed(3);
+            const gx = lerp(CN.x, r.D.x, u), gy = lerp(CN.y, r.D.y, u);
+            r.gs.setAttribute('transform', `translate(${gx.toFixed(1)} ${gy.toFixed(1)}) rotate(${(r.gAng + (back ? 180 : 0)).toFixed(1)}) scale(${(1 - alt * .35).toFixed(3)})`);
+            r.gs.style.opacity = (vis * (.6 - alt * .38)).toFixed(3);
+            const done = seg(t, .96, 1);
+            r.flow.style.opacity = (done * .9).toFixed(3);
+            if (done > 0) r.flow.style.strokeDashoffset = (-((time * len * .32) % (len * 1.28))).toFixed(1);
+            r.node.classList.toggle('is-on', t >= .99);
+            land = Math.max(land, seg(t, .84, 1));
+            if (t < .99) all = false;
+          });
           cn.classList.toggle('is-on', e > .8);
-          co.classList.toggle('is-on', t >= .99);
-          // Los mapas se iluminan: China al despegar, Colombia al aterrizar
-          const leave = t > 0 && t < .4 ? Math.sin(Math.PI * seg(t, 0, .4)) : 0;
+          const t0 = routes[0].t;
+          const leave = t0 > 0 && t0 < .4 ? Math.sin(Math.PI * seg(t0, 0, .4)) : 0;
           const breathe = RM ? 0 : (Math.sin(time * 1.6) + 1) * .05;
           plane3.style.setProperty('--hcn', clamp(seg(e, .5, 1) * .3 + leave * .7 + breathe).toFixed(3));
-          plane3.style.setProperty('--hco', clamp(seg(e, .5, 1) * .16 + seg(t, .84, 1) * .84 + (t >= .99 ? breathe : 0)).toFixed(3));
-          // Plano inclinado tipo navegación, oscilando suave con el cursor
+          plane3.style.setProperty('--hco', clamp(seg(e, .5, 1) * .16 + land * .84 + (all ? breathe : 0)).toFixed(3));
           const tilt = lerp(30, 54, eo(seg(e, .1, 1)));
-          const rz = RM ? -10 : -10 + Math.sin(time * .16) * 16 + mx * 8;
+          const rz = RM ? -8 : -8 + Math.sin(time * .16) * 7 + mx * 4;
           plane3.style.transform = `translate(-50%,-50%) rotateX(${tilt.toFixed(2)}deg) rotateZ(${rz.toFixed(3)}deg)`;
           const sr = stage.getBoundingClientRect();
           lbls.forEach(lb => {
             const r = lb.dot.getBoundingClientRect();
             lb.el.style.transform = `translate3d(${(r.left + r.width / 2 - sr.left).toFixed(1)}px,${(r.top - sr.top).toFixed(1)}px,0) translate(-50%,-125%)`;
             lb.el.classList.toggle('is-on', lb.node.classList.contains('is-on'));
-            lb.el.style.opacity = (lb.node === cn ? seg(e, .5, 1) : seg(t, .85, 1)).toFixed(3);
+            lb.el.style.opacity = (lb.id === 'cn' ? seg(e, .5, 1) : seg(byId[lb.id].t, .85, 1)).toFixed(3);
           });
           countries.forEach((c, i) => c.classList.toggle('is-on', i < 5 ? p > .52 + i * .065 : p > .88));
           drawSeq(seq, p);
@@ -1292,7 +1359,7 @@
           const out1 = seg(p, .18, .26);
           op(head, 1 - out1, `translateY(calc(-50% - ${out1 * 60}px))`);
           const a = eo(seg(p, .26, .36)), fall = eio(seg(p, .42, .6)), land = eo(seg(p, .56, .72));
-          f15.textContent = `${Math.max(1, Math.round(15 - fall * 14))}%`;
+          f15.textContent = `${Math.max(1, Math.round(10 - fall * 9))}%`;
           op(f15, a * (1 - fall), `translateY(${(1 - a) * -12 + fall * 70}vh)`);
           op(f0, land, `translateY(${(1 - land) * -70}vh) scale(${lerp(1.15, 1, land)})`);
           glow.style.opacity = land;
@@ -1406,7 +1473,7 @@
           const cool = seg(p, .7, .85);
           const rx = RM ? 0 : -my * 7 * cool, ry = RM ? 0 : mx * 12 * cool + Math.sin(time * .5) * 4 * cool;
           inner.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg) scale(${lerp(.9, 1, eo(a))})`;
-          // Ondas de puntos sobre el cinturón (como la tarjeta DropiPay) y brillo que lo recorre
+          // Ondas de puntos sobre el cinturón (como la tarjeta dropiPay) y brillo que lo recorre
           const sweep = RM ? 16 : 16 + Math.sin(time * .55) * 26 + ry * 1.5;
           beltDots.draw(dt, sweep, fe > .25);
           if (sheen) sheen.style.setProperty('--sx', `${(130 - ((time * 22) % 200)).toFixed(1)}%`);
@@ -1508,7 +1575,7 @@
             });
           });
 
-          // 1 Económicos: tarjeta DropiPay
+          // 1 Económicos: tarjeta dropiPay
           const c1 = c(1), cr = RM ? 0 : mx * 7, cy = RM ? 0 : -my * 5;
           const fl = RM ? 0 : Math.sin(time * .8) * 1.2;
           const ry = lerp(-34, 16, eo(c1 / 2)) + cr;
