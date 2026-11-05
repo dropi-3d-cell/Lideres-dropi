@@ -17,6 +17,7 @@ se muestra el respaldo vectorial, así que puedes ir agregándolos de a uno.
 | Fondo "Tú, mejor líder" y WEBE | se carga desde Drive (IMG-lider-1) si es público; si no, `assets/img/lider.jpg` / `webe.jpg` |
 | Fondos genéricos | `assets/img/ruta.jpg`, `gala.jpg` (reemplázalos con el mismo nombre) |
 | Tarjeta DropiPay | `assets/img/dropipay-card.webp` |
+| Video de WEBE (entre el titular y el 10%) | `assets/video/webe-promo.mp4` y portada `assets/video/webe-promo-poster.jpg` |
 
 Las rutas de las fotos se cambian en el atributo `data-srcs` del HTML (separa alternativas con `|`).
 

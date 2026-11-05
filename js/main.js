@@ -1351,21 +1351,37 @@
       const head = $('.webe-head', el), h = $('.h-xl', el), lead = $('.lead', head);
       const f15 = $('.fee-15', el), f0 = $('.fee-0', el), glow = $('.fee-glow', el), ca = $('.fee-cap--a', el), cb = $('.fee-cap--b', el);
       const photo = $('.photo--webe', el);
+      /* Video: sin autoplay; se pausa al salir de su paso */
+      const pv = $('.pv', el), frame = $('.pv-frame', el), vid = $('.pv-video', el), playBtn = $('.pv-play', el);
+      const sync = () => { frame.classList.toggle('is-playing', !vid.paused && !vid.ended); pv.classList.toggle('is-ended', vid.ended); };
+      ['play', 'pause', 'ended', 'seeked'].forEach(ev => vid.addEventListener(ev, sync));
+      playBtn.addEventListener('click', () => { if (vid.ended) vid.currentTime = 0; vid.play().catch(() => {}); });
       return {
         live: !RM,
         update(p, e) {
           lensParallax(photo, eo(seg(e, .2, 1)));
           revealLines(h, seg(e, .35, 1));
           op(lead, seg(e, .6, 1));
-          const out1 = seg(p, .18, .26);
+          /* 1) titular sale */
+          const out1 = seg(p, .12, .2);
           op(head, 1 - out1, `translateY(calc(-50% - ${out1 * 60}px))`);
-          const a = eo(seg(p, .26, .36)), fall = eio(seg(p, .42, .6)), land = eo(seg(p, .56, .72));
+          /* 2) el video se revela y luego sale */
+          const vin = eo(seg(p, .2, .3)), vout = eio(seg(p, .38, .46)), vis = vin * (1 - vout);
+          pv.style.opacity = vis;
+          pv.style.transform = `translateY(${(1 - vin) * 5 - vout * 6}vh)`;
+          frame.style.clipPath = `inset(${(1 - vin) * 32}% ${(1 - vin) * 32}% round 20px)`;
+          frame.style.transform = `scale(${lerp(.9, 1, vin)})`;
+          const on = vis > .6;
+          pv.classList.toggle('is-on', on);
+          if (!on && !vid.paused) vid.pause();
+          /* 3) 10% → 0% */
+          const a = eo(seg(p, .46, .55)), fall = eio(seg(p, .61, .775)), land = eo(seg(p, .74, .885));
           f15.textContent = `${Math.max(1, Math.round(10 - fall * 9))}%`;
           op(f15, a * (1 - fall), `translateY(${(1 - a) * -12 + fall * 70}vh)`);
           op(f0, land, `translateY(${(1 - land) * -70}vh) scale(${lerp(1.15, 1, land)})`);
           glow.style.opacity = land;
-          op(ca, a * (1 - seg(p, .44, .5)));
-          op(cb, seg(p, .7, .78), `translateY(${(1 - seg(p, .7, .78)) * 14}px)`);
+          op(ca, a * (1 - seg(p, .63, .68)));
+          op(cb, seg(p, .865, .94), `translateY(${(1 - seg(p, .865, .94)) * 14}px)`);
         }
       };
     },
@@ -1910,7 +1926,7 @@
   }
   function hide(s) {
     s.vis = false; s.el.classList.remove('is-vis'); s.el.setAttribute('inert', '');
-    s.el.querySelectorAll('.bg-video video').forEach(v => v.pause());
+    s.el.querySelectorAll('.bg-video video, .pv-video').forEach(v => v.pause());
   }
 
   function done() {
@@ -2072,7 +2088,7 @@
   addEventListener('keydown', e => {
     if (e.altKey || e.ctrlKey || e.metaKey) return;
     if (e.target.closest('input, textarea, select, [contenteditable]')) return;
-    const k = e.key, onBtn = e.target.closest('button, a');
+    const k = e.key, onBtn = e.target.closest('button, a, video');
     let d = 0;
     if (k === 'ArrowDown' || k === 'PageDown' || (k === ' ' && !e.shiftKey && !onBtn)) d = 1;
     else if (k === 'ArrowUp' || k === 'PageUp' || (k === ' ' && e.shiftKey && !onBtn)) d = -1;
