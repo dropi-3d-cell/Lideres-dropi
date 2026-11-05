@@ -1874,3 +1874,38 @@ html:not(.js) .dp > *, html:not(.js) .mx > * { opacity: 1; transform: none; }
 .lider-info .miles-count { color: #ddd5cc; }
 .lider-info .miles .ui-note { color: rgba(238, 231, 223, .55); }
 @media (max-width: 760px) { .lider-info::before { inset: -1.2rem -1rem; } }
+
+
+/* =========================================================
+   Ajustes v4 · subdivisión Bronce / Plata / Oro en los medallones
+   Las bandas cubren las columnas Efectividad y Popularidad
+   (Impacto económico queda fuera: usa placas, no cinturones)
+   ========================================================= */
+.s-ley .ley-dash { inset: calc(var(--top) + 8px) var(--gutter) 84px; }
+.s-ley .axes { --axgap: clamp(16px, 3vw, 48px); gap: var(--axgap); }
+.s-ley .axis { gap: clamp(24px, 5vh, 56px); }
+.s-ley .axis-bar, .s-ley .tiers { z-index: 1; }
+
+.tier-bands { position: absolute; z-index: 0; top: 56px; bottom: 0; left: -14px; width: calc(200% + var(--axgap) - 8px); pointer-events: none; }
+.tier-band {
+  --c: 255, 132, 5;
+  position: absolute; left: 0; right: 0; bottom: var(--pos); transform: translateY(50%);
+  height: calc(33.333% - 26px); border: 1px dashed rgba(var(--c), .55); border-radius: 2px;
+  background: linear-gradient(90deg, rgba(var(--c), 0) 30%, rgba(var(--c), .16) 100%);
+  opacity: .55; transition: opacity .8s var(--ease), background .8s var(--ease);
+}
+.tier-band span {
+  position: absolute; top: 4px; right: 8px; font-family: var(--f-display); font-weight: 800;
+  font-size: clamp(1.3rem, 2vw, 2.2rem); line-height: 1; letter-spacing: .02em; text-transform: uppercase; color: #fff;
+}
+.tier-band--bronce { --c: 255, 72, 0; }
+.tier-band--plata  { --c: 214, 214, 220; }
+.tier-band--oro    { --c: 255, 150, 0; }
+.tier-band.is-on { opacity: 1; background: linear-gradient(90deg, rgba(var(--c), 0) 25%, rgba(var(--c), .34) 70%, rgba(var(--c), .9) 100%); }
+.tier-band--plata.is-on { background: linear-gradient(90deg, rgba(var(--c), .04) 0%, rgba(var(--c), .14) 100%); }
+
+@media (max-width: 760px) {
+  .tier-bands { display: none; }
+  .s-ley .ley-dash { inset: calc(var(--top) + 32px) var(--gutter) 120px; }
+  .s-ley .axis { gap: 8px; }
+}

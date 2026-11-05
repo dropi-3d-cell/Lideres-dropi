@@ -1412,6 +1412,7 @@
     ley(el) {
       const head = $('.ley-head', el), h = $('.h-xl', el), lead = $('.lead', head), dash = $('.ley-dash', el), access = $('.ley-access', el);
       const dropsVal = $('.drops-val', el), bgv = $('.bg-video', el), photo = $('.photo--ley', el);
+      const bands = $$('.tier-band', el);
       const axes = $$('.axis', el).map(a => ({
         el: a, val: $('.axis-val', a), tiers: $$('.tier', a),
         steps: a.dataset.steps.split(',').map(Number), usd: a.dataset.format === 'usd'
@@ -1449,6 +1450,7 @@
             const n = a.tiers.length;
             a.tiers.forEach((t, k) => t.classList.toggle('is-on', f >= (k + 1) / n - .001));
           });
+          bands.forEach((bd, k) => bd.classList.toggle('is-on', axes.slice(0, 2).some(a => a.tiers[k] && a.tiers[k].classList.contains('is-on'))));
           op(access, seg(p, .88, .95), `translateX(-50%) translateY(${(1 - seg(p, .88, .95)) * 16}px)`);
           const allOn = allTiers.length && allTiers.every(t => t.classList.contains('is-on'));
           el.classList.toggle('all-on', !!allOn);
